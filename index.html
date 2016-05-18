@@ -35,13 +35,21 @@ _{reFxmjVpAeBn@{@w@aAc@m@yAsBJuAC}BIeAO_Ak@sBCQOg@g@aAk@}@qAwAs@s@}
 You can't paste that in here, save it to a local file and drop it on the target or hit the button and select it. That fragment above
 can actually be used and translates to the following geoJSON:
 <pre>
-{"type":"GeometryCollection","geometries":[{
-    "type":"LineString","coordinates":[
+{
+"type": "FeatureCollection",
+                                                                                
+"features": [
+{ "type": "Feature", "id": 1, "properties": { "ID": 1.000000 }, "geometry": { "type": "LineString", "coordinates": [ 
+
        [37.78496,-3.82701],[37.78455,-3.8265],[37.78431,-3.8262],[37.78459,-3.82587],
        [37.78477,-3.82564],[37.78522,-3.82506],[37.78516,-3.82463],[37.78518,-3.824],
        [37.78523,-3.82365],[37.78531,-3.82333],[37.78553,-3.82275],[37.78555,-3.82266],
        [37.78563,-3.82246],[37.78583,-3.82213],[37.78605,-3.82182],[37.78646,-3.82138],
-       [37.78672,-3.82112],[37.78863,-3.82112]]}]}
+       [37.78672,-3.82112],[37.78863,-3.82112]
+] } }
+]
+}
+
 </pre>
 </p>
 
@@ -85,10 +93,18 @@ function makeGeoJSON(polylines){
        oFReader = new FileReader();
        oFReader.onloadend = function() {
 
-	        	var linestringarray =  {"type":"LineString",
-                                "coordinates": makeGeoJSON(this.result)};
-                        var geojson = {"type":"GeometryCollection",
-                            "geometries": [ linestringarray ]};
+
+                        var geojson = {
+                          "type": "FeatureCollection",
+                          "features": [
+                             {"type": "Feature", "id":1, "properties": {"ID": 1.00000}, "geometry": {
+                                 "type": "LineString",
+                                 "coordinates": makeGeoJSON(this.result)
+                                  }
+                             }
+                           ]
+                         }
+                             
                         var json = JSON.stringify(geojson);
 
 	        	var blob = new Blob([json], {type: 'application/json'});
