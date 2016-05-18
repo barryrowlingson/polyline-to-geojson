@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Encoded Polyline to geoJSON Converter in HTML5</title>
+<style>
+#drop {
+	border:5px solid #000;
+	margin-bottom:20px;
+	padding:10px;
+}
+</style>
+
+
+</head>
+<body>
+	<h1>Drag and Drop Encoded Polyline to geoJSON Conversion</h1>
+<p>With Massive Respect to <a href="http://techslides.com/convert-csv-to-json-in-javascript">THIS HERO</a> who 
+wrote the whole file conversion framework, and <a href="https://github.com/mapbox/polyline">THESE HEROES</a> who
+wrote the  converter. I just glued the bits together.</p>
+
+	<p>Drop or select a file with google-encoded polylines file and this will convert it and return a link to a geoJSON file. Save the generated link 
+to your PC and load into your favourite GIS.</p>
+<div id="drop">
+	DROP!<button onclick="document.querySelector('input').click()">Or Select</button>
+	<input style="visibility: collapse; width: 0px;" type="file" onchange="upload(this.files[0])">
+</div>
+
+<div id="output"></div>
+
+<p>
+A google-encoded polyline looks a bit like this:
+<pre>
+_{reFxmjVpAeBn@{@w@aAc@m@yAsBJuAC}BIeAO_Ak@sBCQOg@g@aAk@}@qAwAs@s@}
+</pre>
+You can't paste that in here, save it to a local file and drop it on the target or hit the button and select it. That fragment above
+can actually be used and translates to the following geoJSON:
+<pre>
+{"type":"GeometryCollection","geometries":[{
+    "type":"LineString","coordinates":[
+       [37.78496,-3.82701],[37.78455,-3.8265],[37.78431,-3.8262],[37.78459,-3.82587],
+       [37.78477,-3.82564],[37.78522,-3.82506],[37.78516,-3.82463],[37.78518,-3.824],
+       [37.78523,-3.82365],[37.78531,-3.82333],[37.78553,-3.82275],[37.78555,-3.82266],
+       [37.78563,-3.82246],[37.78583,-3.82213],[37.78605,-3.82182],[37.78646,-3.82138],
+       [37.78672,-3.82112],[37.78863,-3.82112]]}]}
+</pre>
+</p>
+
+<hr/>
+<p>Hacked together by Barry Rowlingson</p>
+<script src="polyline.js"></script>
+
+<script type="text/javascript">
+
+var output = document.getElementById("output");
+
+
+//var csv is the CSV file with headers
+function makeGeoJSON(polylines){
+ 
+  var result=polyline.decode(polylines)
+  
+  //return result; //JavaScript object
+  return result;
+//  return JSON.stringify(result); //JSON
+}
+
+
+
+
+    /* Drag drop stuff */
+    window.ondragover = function(e) {e.preventDefault()}
+    window.ondrop = function(e) {
+	    e.preventDefault();
+	    console.log("Reading...");
+	    var length = e.dataTransfer.items.length;
+	    if(length > 1){
+	    	console.log("Please only drop 1 file.");
+	    } else {
+	    	upload(e.dataTransfer.files[0]);
+	    }
+	}
+
+    /* main upload function */
+    function upload(file) {
+       oFReader = new FileReader();
+       oFReader.onloadend = function() {
+
+	        	var linestringarray =  {"type":"LineString",
+                                "coordinates": makeGeoJSON(this.result)};
+                        var geojson = {"type":"GeometryCollection",
+                            "geometries": [ linestringarray ]};
+                        var json = JSON.stringify(geojson);
+
+	        	var blob = new Blob([json], {type: 'application/json'});
+	        	var url = URL.createObjectURL(blob);
+	        	output.innerHTML = '<a href="'+url+'">JSON file</a>';
+
+
+
+	        };
+	        oFReader.readAsText(file);
+    }
+</script>
+</body>
+</html>
